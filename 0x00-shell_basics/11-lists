@@ -1,2 +1,2 @@
 #!/bin/bash
-printf "%s\n" . .. /boot | xargs -n1 ls -lan
+ls -lna . .. /boot
