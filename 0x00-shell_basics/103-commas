@@ -1,2 +1,2 @@
 #!/bin/bash
-printf "%s\n" . .. * | sort -V | awk 'BEGIN{ORS=", "}{print}' | awk '{print $0 "\n"}'
+ls -xmap
