@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
-# Configure Nginx so that its HTTP response contains
-sudo apt-get update
+#This script installs nginx and configures it
+
+sudo apt-get -y update
 sudo apt-get -y install nginx
 
-sudo ufw allow 'Nginx HTTP'
+HOST_NAME=$(hostname)
+HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
+FIND=$(grep "X-Served-By" /etc/nginx/sites-available/default)
 
-sudo mkdir -p /var/www/html
+if [[ -z $FIND ]]; then
+	sudo sed -i "24i $HEADER" /etc/nginx/sites-available/default
+fi
+#Setup and giving permissions for index-debian.html and error.html
 
-sudo chmod -R 755 /var/www
+echo -e "Hello World!" | sudo tee /var/www/html/index.nginx-debian.html
 
-echo 'Hello World!' |sudo tee  /var/www/html/index.html
+# Add the redirection rule directly to the Nginx configuration file
+sudo sed -i '24i\    rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
 
-echo "Ceci n'est pas une page" |sudo tee /var/www/html/404.html
-
-string_for_replacement="server_name _;\n\tadd_header X-Served-By \$hostname;\n\trewrite ^\/redirect_me https:\/\/www.blog.ehoneahobed.com permanent;"
-sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/nginx/sites-enabled/default
-
-string_for_replacement="listen 80 default_server;\n\terror_page 404 \/404.html;\n\tlocation = \/404.html {\n\t\troot \/var\/www\/html;\n\t\tinternal;\n\t}"
-sudo sed -i "s/listen 80 default_server;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+# Add the nginx conf for error page 404
+sudo sed -i '24i\    rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/error_404.html
+sudo sed -i '46i\ error_page 404 /error_404.html;' /etc/nginx/sites-available/default
 
 sudo service nginx restart
