@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Create a script to install and configure HAProxy on lb-01 server
+sudo apt-get -y update
+apt-get -y install haproxy
+
+# edit config file
+server_config=\
+"
+frontend  elfakiri-frontend
+        bind *:80
+        mode http
+        default_backend elfakiri-backend
+backend elfakiri-backend
+        balance roundrobin
+        server 372379-web-01 100.25.156.44 check
+        server 372379-web-02 54.237.21.50 check
+"
+echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
+
+# enable haproxy to be started by init script
+
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+
+sudo service haproxy restart
