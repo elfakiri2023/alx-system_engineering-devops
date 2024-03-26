@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
-This python script is sing th I, for a given employee ID,
-returns information O list progress.
+This python script is sing this REST API, for a given employee ID,
+returns information about his/her TODO list progress.
 """
 
 
