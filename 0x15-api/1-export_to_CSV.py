@@ -1,24 +1,27 @@
 #!/usr/bin/python3
-"""Accessing a RES mployees"""
+""" This python script exports data in CSV format """
 
+import csv
 import requests
 import sys
 
+if __name__ == "__main__":
 
-if __name__ == '__main__':
-    employeeId = sys.argv[1]
-    baseUrl = "https://jsonplaceholder.typicode.com/users"
-    url = baseUrl + "/" + employeeId
+    userId = sys.argv[1]
+    user = requests.get(
+            "https://jsonplaceholder.typicode.com/users/{}"
+            .format(userId))
+    name = user.json().get('username')
 
-    response = requests.get(url)
-    username = response.json().get('username')
+    todos = requests.get("https://jsonplaceholder.typicode.com/todos")
 
-    todoUrl = url + "/todos"
-    response = requests.get(todoUrl)
-    tasks = response.json()
-
-    with open('{}.csv'.format(employeeId), 'w') as file:
-        for task in tasks:
-            file.write('"{}","{}","{}","{}"\n'
-                       .format(employeeId, username, task.get('completed'),
-                               task.get('title')))
+    filename = userId + ".csv"
+    with open(filename, 'w') as csvf:
+        writer = csv.writer(
+                csvf, delimiter=',', quotechar='"',
+                quoting=csv.QUOTE_ALL, lineterminator='\n')
+        for task in todos.json():
+            if task.get('userId') == int(userId):
+                writer.writerow(
+                        [userId, name, str(task.get("completed")),
+                            task.get("title")])
